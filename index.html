@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UNIQUE - POS - Mall Shop</title>
+<style>
+*{box-sizing:border-box}body{font-family:Arial,sans-serif;margin:0;background:#fff5f8}
+.top{background:#111;color:#fff;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:20}
+.top h1{margin:0;letter-spacing:3px}.top small{color:#7ec850}
+button{padding:13px;border:3px solid #111;border-radius:10px;font-weight:900;cursor:pointer;background:#fff}
+input,select{padding:12px;border:3px solid #111;border-radius:10px;font-weight:900;width:100%}
+.scanbar{background:#fff;padding:10px 14px;display:flex;gap:8px;flex-wrap:wrap;border-bottom:4px solid #ff5aa5;position:sticky;top:62px;z-index:19}
+.scanbar input{flex:2}.scanbar button{flex:1;background:#111;color:#fff}
+.wrap{display:flex;gap:10px;padding:10px 14px;max-width:1300px;margin:0 auto}
+.left{flex:1.9}.right{flex:1;min-width:340px}
+.cats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.catbtn{background:#ff5aa5;color:#fff;font-size:17px;padding:22px 8px;border-color:#111}
+.catbtn small{display:block;font-size:12px;color:#fff}
+.backbtn{background:#111;color:#fff;width:100%;margin-bottom:8px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.card{background:#fff;border:3px solid #eee;border-radius:12px;padding:10px}
+.card b{font-size:15px}.price{color:#4da52e;font-size:19px;font-weight:900}.low{color:red}
+.card button{background:#7ec850;width:100%;margin-top:6px}
+.cart{background:#fff;border:4px solid #111;border-radius:14px;padding:12px;position:sticky;top:140px}
+.row{display:flex;justify-content:space-between;gap:6px;padding:7px 0;border-bottom:2px solid #eee;font-size:13px}
+.row button{width:auto;padding:5px 9px;margin:0}
+.total{font-size:26px;font-weight:900;display:flex;justify-content:space-between}
+.paybtn{width:100%;padding:16px;font-size:18px;background:#7ec850;margin-top:6px}
+.drawerbtn{width:100%;background:#ffd700;margin-top:6px}
+.mgmtbtn{width:100%;background:#111;color:#fff;margin-top:6px}
+#mgmt,#receipt{position:fixed;inset:0;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;z-index:99}
+.paper{background:#fff;width:420px;max-height:92vh;overflow:auto;padding:16px;border-radius:12px}
+.paper table{width:100%;border-collapse:collapse;font-size:12px}.paper td,.paper th{border:1px solid #ddd;padding:4px}
+@media(max-width:850px){.wrap{flex-direction:column}.cart{position:static}.cats{grid-template-columns:1fr 1fr}}
+@media print{body *{visibility:hidden}#receipt,#receipt *{visibility:visible}#receipt{position:absolute;inset:0;display:flex;background:#fff}}
+</style></head><body>
+<div class="top"><div><h1>UNIQUE</h1><small>BEAUTY & FASHION ACCESSORIES • MALL SHOP</small></div><div style="text-align:right;font-weight:900"><span id="clock"></span><br><button onclick="openMgmt()" style="padding:8px;background:#fff;color:#111">🔒 MANAGEMENT</button></div></div>
+
+<div class="scanbar">
+<input id="scan" placeholder="🔍 SCAN / TYPE BARCODE - e.g. ITE0022 + Enter" onkeydown="if(event.key==='Enter')doScan()">
+<button onclick="doScan()">SCAN ADD +</button>
+<button onclick="openDrawer()">💵 OPEN CASH DRAWER</button>
+</div>
+
+<div class="wrap"><div class="left">
+<div id="cats" class="cats"></div>
+<button id="backBtn" class="backbtn" style="display:none" onclick="showCats()">← BACK TO ALL GROUPS</button>
+<div id="grid" class="grid"></div>
+</div>
+
+<div class="right"><div class="cart">
+<h2 style="margin:0;text-align:center">🛒 CURRENT SALE</h2><p style="text-align:center;margin:4px">Order <b id="orderNo"></b></p>
+<div id="cart"></div>
+<div class="total"><span>TOTAL</span><span id="total">R0</span></div>
+<select id="payMethod"><option>Cash</option><option>Card</option><option>Card + Cash</option><option>EFT / Tap</option></select>
+<input id="cashGiven" type="number" placeholder="Cash given - e.g. 200 (for change)">
+<div id="change" style="font-weight:900;text-align:center"></div>
+<input id="cust" placeholder="Customer name / phone (optional)">
+<input id="extraNote" placeholder="Extra - if you forgot something">
+<button class="paybtn" onclick="checkout()">💳 CHECKOUT & PRINT</button>
+<button class="drawerbtn" onclick="openDrawer()">💵 OPEN DRAWER</button>
+<button onclick="cart=[];renderCart()" style="width:100%;background:#eee">Clear Sale</button>
+<p style="text-align:center;font-weight:800">UNIQUE 💚💗 Thank You!</p>
+</div></div></div>
+
+<div id="receipt"><div class="paper" id="paper"></div></div>
+<div id="mgmt"><div class="paper" id="mgmtPaper"></div></div>
+
+<script>
+let ITEMS=[
+["ITE0001","Glasses A",80],["ITE0002","Glasses B",150],["ITE0003","Glasses C",100],["ITE0004","Glasses D",120],
+["ITE0005","Nail Paint A",15],["ITE0006","Nail Paint B",5],["ITE0007","Traditional Earring A",50],["ITE0008","Traditional Earring B",70],["ITE0009","Traditional Earring C",100],["ITE0010","Traditional Earring D",30],
+["ITE0011","Wallet A",300],["ITE0012","Wallet B",50],["ITE0013","Wallet C",100],["ITE0014","Wallet D",150],["ITE0015","Wallet E",250],
+["ITE0016","Fashion Earring 1",20],["ITE0017","Fashion Earring 2",30],["ITE0018","Fashion Earring 3",40],["ITE0019","Fashion Earring 4",50],
+["ITE0020","Knob A",10],["ITE0021","Knob B",20],["ITE0022","Watch A",50],["ITE0023","Watch B",100],["ITE0024","Watch C",150],["ITE0025","Watch D",200],
+["ITE0026","Watch E",250],["ITE0027","Watch F",300],["ITE0028","Watch G - Smart",600],
+["ITE0029","Bracelet A",40],["ITE0030","Bracelet B",60],["ITE0031","Bracelet C",80],["ITE0032","Bracelet D",25],["ITE0033","Bracelet E",100],
+["ITE0034","Chain A",100],["ITE0035","Chain B",80],["ITE0036","Chain C",60],["ITE0037","Chain D",50],
+["ITE0038","Brow Cheek 1",50],["ITE0039","Brow Cheek 2",30],["ITE0040","Crew Shed 1",70],["ITE0041","Crew Shed 2",40],["ITE0042","Crew Shed 3",80],["ITE0043","Crew Shed 4",100],
+["ITE0044","Wig Cap 1",20],["ITE0045","Wig Cap 2",40],["ITE0046","Durag A",50],["ITE0047","Durag B",100],
+["ITE0048","Needle A",10],["ITE0049","Needle B",30],["ITE0050","Sewing Thread A",5],
+["ITE0051","Sewing Thread B",10],["ITE0052","Sewing Thread C",15],["ITE0053","Sewing Thread D",20],
+["ITE0054","Shoe Sole 1",50],["ITE0055","Shoe Sole 2",70],["ITE0056","Shoe Sole 3",80],["ITE0057","Heel",20],["ITE0058","Long Sole",90],
+["ITE0059","Glove 1",5],["ITE0060","Glove 2",10],["ITE0061","Pantyhose 1",30],["ITE0062","Pantyhose 2",60],["ITE0063","Pantyhose 3",100],
+["ITE0064","Zip 1",25],["ITE0065","Zip 2",10],["ITE0066","Zip 3",20],
+["ITE0067","Shoe Needle 1",20],["ITE0068","Shoe Needle 2",6],["ITE0069","Shoe Needle 3",60],["ITE0070","Shoe Needle White",30],["ITE0071","Shoe Needle Black",30],
+["ITE0072","Machine Oil",60],["ITE0073","Pin 1",20],["ITE0074","Pin 2",25],
+["ITE0075","Lace Head Belt A",30],["ITE0076","Lace Head Belt B",40],["ITE0077","Reborn Colour",50],["ITE0078","Rasta Reborn",20],
+["ITE0079","Elastic Small",7],["ITE0080","Elastic Medium",20],["ITE0081","Reborn Lace",85],["ITE0082","Venda Reborn",10],["ITE0083","Lace Reborn",5],
+["ITE0084","Cutting Zip",50],["ITE0085","Ziplock",30],["ITE0086","Cap Top Pop Belt",50],["ITE0087","Flute For Music",100],
+["ITE0088","Fish Lane Stitch",50],["ITE0089","Fish Lane Stretch",50],["ITE0090","Fish Lane Heart",50],["ITE0091","Beat String",7],["ITE0092","Suspenders",70],
+["ITE0093","Short Gloves",50],["ITE0094","Long Gloves",80],["ITE0095","Parton 1",10],["ITE0096","Parton 2",6],["ITE0097","Partool",30],["ITE0098","Press Stance",30],["ITE0099","Back Lace",30],
+["ITE0100","Earring Hooks",20],["ITE0101","Chain Holders",20],["ITE0102","Shampoo Cap",150],["ITE0103","Socks",50],["ITE0104","Arm Cover",40],["ITE0105","Head Flower",150],
+["ITE0106","Wedding Needles",150],["ITE0107","Wedding Pins",20],["ITE0108","Wedding Veil Length",100]
+];
+// STOCK - saved in browser, management can change it
+let STOCK=JSON.parse(localStorage.getItem("unique_stock")||"null")||{};
+ITEMS.forEach(i=>{if(STOCK[i[0]]==null)STOCK[i[0]]=50});
+let PRICES=JSON.parse(localStorage.getItem("unique_prices")||"null")||{};
+ITEMS.forEach(i=>{if(PRICES[i[0]]==null)PRICES[i[0]]=i[2]});
+function saveAll(){localStorage.setItem("unique_stock",JSON.stringify(STOCK));localStorage.setItem("unique_prices",JSON.stringify(PRICES))}
+let cart=[],orderNo="UQ-"+Math.floor(10000+Math.random()*89999);
+document.getElementById("orderNo").textContent=orderNo;
+function tick(){document.getElementById("clock").textContent=new Date().toLocaleString("en-ZA")}tick();setInterval(tick,1000);
+function catOf(n){let groups=["Glasses","Nail Paint","Traditional Earring","Fashion Earring","Wallet","Knob","Watch","Bracelet","Chain","Brow Cheek","Crew Shed","Wig Cap","Durag","Needle","Sewing Thread","Shoe Sole","Heel","Glove","Pantyhose","Zip","Shoe Needle","Machine Oil","Pin","Lace","Reborn","Elastic","Cutting Zip","Ziplock","Cap","Flute","Fish Lane","Beat String","Suspenders","Parton","Partool","Press Stance","Back Lace","Earring Hooks","Chain Holders","Shampoo Cap","Socks","Arm Cover","Head Flower","Wedding"];for(let g of groups)if(n.startsWith(g))return g;return "Other"}
+let CATS=[...new Set(ITEMS.map(i=>catOf(i[1])))];
+function showCats(){document.getElementById("cats").style.display="grid";document.getElementById("backBtn").style.display="none";document.getElementById("grid").innerHTML="";document.getElementById("cats").innerHTML=CATS.map(c=>{let n=ITEMS.filter(i=>catOf(i[1])===c).length;return `<button class="catbtn" onclick="showGroup('${c}')">${c}<small>${n} types • Tap to open</small></button>`}).join("")}
+function showGroup(c){document.getElementById("cats").style.display="none";document.getElementById("backBtn").style.display="block";document.getElementById("grid").innerHTML=`<h2 style="grid-column:1/-1;margin:0">${c}</h2>`+ITEMS.filter(i=>catOf(i[1])===c).map(i=>`<div class="card"><small>${i[0]} • Stock: ${STOCK[i[0]]} ${STOCK[i[0]]<=5?'<span class="low">LOW!</span>':''}</small><br><b>${i[1]}</b><br><span class="price">R${PRICES[i[0]]}</span><br><small>Barcode: || ${i[0]} ||</small><button onclick="add('${i[0]}')">ADD +</button></div>`).join("")}
+function add(code){if(STOCK[code]<=0)return alert("OUT OF STOCK - "+code);let it=ITEMS.find(x=>x[0]===code);let f=cart.find(x=>x.code===code);if(f)f.qty++;else cart.push({code,name:it[1],price:PRICES[code],qty:1});renderCart();document.getElementById("scan").value="";document.getElementById("scan").focus()}
+function doScan(){let v=document.getElementById("scan").value.trim().toUpperCase();if(!v)return;let it=ITEMS.find(x=>x[0]===v||x[1].toUpperCase()===v);if(!it)return alert("Barcode not found: "+v);add(v)}
+function renderCart(){let t=0;document.getElementById("cart").innerHTML=cart.map((s,i)=>{t+=s.price*s.qty;return `<div class="row"><span><b>${s.code}</b> ${s.name}<br>${s.qty} x R${s.price}</span><span>R${s.price*s.qty}<br><button onclick="cart[${i}].qty--;if(cart[${i}].qty<=0)cart.splice(${i},1);renderCart()">-</button> <button onclick="cart[${i}].qty++;renderCart()">+</button> <button onclick="cart.splice(${i},1);renderCart()">✕</button></span></div>`}).join("")||"<p>Scan or tap a group 👆</p>";document.getElementById("total").textContent="R"+t;let given=parseFloat(document.getElementById("cashGiven").value||0);document.getElementById("change").textContent=given>0?"Change: R"+Math.max(0,given-t).toFixed(2):""}
+document.getElementById("cashGiven").addEventListener("input",renderCart);
+function openDrawer(){alert("💵 CASH DRAWER OPEN\nDrawer will open on printer / till.\nIf using USB drawer, it opens on PRINT.");}
+function checkout(){if(!cart.length)return alert("Add item first");let t=cart.reduce((a,s)=>a+s.price*s.qty,0);let method=document.getElementById("payMethod").value;let cust=document.getElementById("cust").value;let note=document.getElementById("extraNote").value;let rows=cart.map(s=>`<div style="display:flex;justify-content:space-between"><span>${s.code} ${s.name} x${s.qty}</span><span>R${s.price*s.qty}</span></div><div style="font-size:11px">Barcode: || ${s.code} ||</div>`).join("");cart.forEach(s=>{STOCK[s.code]-=s.qty});saveAll();document.getElementById("paper").innerHTML=`<div style="text-align:center"><h2>UNIQUE</h2>Beauty & Fashion Accessories<br>MALL SHOP<br>Order ${orderNo}<br>${new Date().toLocaleString("en-ZA")}<br>${cust?cust+"<br>":""}<hr>${rows}<hr><div style="display:flex;justify-content:space-between"><b>TOTAL</b><b>R${t}</b></div><div>Paid: ${method}</div>${note?"Extra: "+note+"<br>":""}<hr><b>THANK YOU!</b><br><button onclick="window.print()" style="width:100%;background:#111;color:#fff">🖨️ PRINT RECEIPT</button><button onclick="openDrawer();closeReceipt()" style="width:100%;background:#ffd700">💵 OPEN DRAWER + NEW SALE</button></div>`;document.getElementById("receipt").style.display="flex"}
+function closeReceipt(){document.getElementById("receipt").style.display="none";cart=[];orderNo="UQ-"+Math.floor(10000+Math.random()*89999);document.getElementById("orderNo").textContent=orderNo;document.getElementById("cashGiven").value="";document.getElementById("extraNote").value="";renderCart();showCats()}
+function openMgmt(){let p=prompt("MANAGEMENT PIN:");if(p!=="1234")return alert("Wrong PIN - Cashier cannot enter");let rows=ITEMS.map(i=>`<tr><td>${i[0]}</td><td>${i[1]}</td><td><input id="p_${i[0]}" type="number" value="${PRICES[i[0]]}"></td><td><input id="s_${i[0]}" type="number" value="${STOCK[i[0]]}"></td></tr>`).join("");document.getElementById("mgmtPaper").innerHTML=`<h2>🔒 MANAGEMENT / BACK OFFICE</h2><p>Only management. Change Price + Stock here. Cashier cannot.</p><input id="newCode" placeholder="New Code - e.g. ITE0109"><input id="newName" placeholder="New Item Name"><input id="newPrice" type="number" placeholder="Price"><button onclick="addNewItem()" style="width:100%;background:#7ec850">+ ADD NEW ITEM</button><div style="max-height:300px;overflow:auto"><table><tr><th>Code</th><th>Item</th><th>Price</th><th>Stock</th></tr>${rows}</table></div><button onclick="saveMgmt()" style="width:100%;background:#111;color:#fff">SAVE ALL</button><button onclick="document.getElementById('mgmt').style.display='none'" style="width:100%">Close</button>`;document.getElementById("mgmt").style.display="flex"}
+function saveMgmt(){ITEMS.forEach(i=>{PRICES[i[0]]=parseFloat(document.getElementById("p_"+i[0]).value)||PRICES[i[0]];STOCK[i[0]]=parseInt(document.getElementById("s_"+i[0]).value)||0});saveAll();document.getElementById("mgmt").style.display="none";alert("Saved! Prices + Stock updated.");showCats()}
+function addNewItem(){let c=document.getElementById("newCode").value.trim().toUpperCase(),n=document.getElementById("newName").value.trim(),p=parseFloat(document.getElementById("newPrice").value);if(!c||!n||!p)return alert("Fill Code, Name, Price");ITEMS.push([c,n,p]);PRICES[c]=p;STOCK[c]=50;saveAll();alert("Added "+c+" - "+n);openMgmt()}
+showCats();renderCart();
+</script></body></html>
