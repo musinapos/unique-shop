@@ -32,7 +32,7 @@ input,select{padding:12px;border:3px solid #111;border-radius:10px;font-weight:9
 @media(max-width:850px){.wrap{flex-direction:column}.cart{position:static}.cats{grid-template-columns:1fr 1fr}}
 @media print{body *{visibility:hidden}#receipt,#receipt *{visibility:visible}#receipt{position:absolute;inset:0;display:flex;background:#fff}}
 </style></head><body>
-<div class="top"><div><h1>UNIQUE</h1><small>BEAUTY & FASHION ACCESSORIES • MALL SHOP</small></div><div style="text-align:right;font-weight:900"><span id="clock"></span><br><button onclick="openMgmt()" style="padding:8px;background:#fff;color:#111">🔒 MANAGEMENT</button></div></div>
+<div class="top"><div style="display:flex;gap:10px;align-items:center"><img src="unique.logo.jpg" style="width:56px;height:56px;border-radius:50%;object-fit:cover;background:#fff"><div><h1>UNIQUE</h1><small>BEAUTY & FASHION ACCESSORIES • MALL SHOP</small></div></div><div style="text-align:right;font-weight:900"><span id="clock"></span><br><button onclick="openMgmt()" style="padding:8px;background:#fff;color:#111">🔒 MANAGEMENT</button></div></div>
 
 <div class="scanbar">
 <input id="scan" placeholder="🔍 SCAN / TYPE BARCODE - e.g. ITE0022 + Enter" onkeydown="if(event.key==='Enter')doScan()">
@@ -91,7 +91,6 @@ let ITEMS=[
 ["ITE0100","Earring Hooks",20],["ITE0101","Chain Holders",20],["ITE0102","Shampoo Cap",150],["ITE0103","Socks",50],["ITE0104","Arm Cover",40],["ITE0105","Head Flower",150],
 ["ITE0106","Wedding Needles",150],["ITE0107","Wedding Pins",20],["ITE0108","Wedding Veil Length",100]
 ];
-// STOCK - saved in browser, management can change it
 let STOCK=JSON.parse(localStorage.getItem("unique_stock")||"null")||{};
 ITEMS.forEach(i=>{if(STOCK[i[0]]==null)STOCK[i[0]]=50});
 let PRICES=JSON.parse(localStorage.getItem("unique_prices")||"null")||{};
