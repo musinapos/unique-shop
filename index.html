@@ -31,7 +31,6 @@ input,select{padding:14px;border:2px solid #ddd;border-radius:12px;font-weight:7
 .total{font-size:26px;font-weight:900;display:flex;justify-content:space-between;color:#006666}
 .paybtn{width:100%;padding:20px;font-size:20px;background:linear-gradient(90deg,#008080,#FFD700);color:#fff;margin-top:8px}
 .drawerbtn{width:100%;background:linear-gradient(90deg,#FFD700,#008080);color:#fff;margin-top:8px;padding:18px;font-size:18px}
-/* LOGIN SCREEN */
 #login{position:fixed;inset:0;background:linear-gradient(180deg,#006666 0%,#00A3A3 55%,#FFD700 100%);display:flex;align-items:center;justify-content:center;z-index:999;padding:16px}
 .loginBox{background:#fff;width:420px;max-width:95vw;padding:24px;border-radius:22px;text-align:center;box-shadow:0 15px 30px rgba(0,0,0,.35);border:4px solid #006666}
 .loginBox input{margin:8px 0}
@@ -42,21 +41,29 @@ input,select{padding:14px;border:2px solid #ddd;border-radius:12px;font-weight:7
 @media print{body *{visibility:hidden}#receipt,#receipt *{visibility:visible}#receipt{position:absolute;inset:0;display:flex;background:#fff} #login{display:none!important}}
 </style></head><body>
 
+<!-- LOADING SCREEN -->
+<div id="loading" style="position:fixed;inset:0;background:linear-gradient(180deg,#006666 0%,#00A3A3 55%,#FFD700 100%);display:none;align-items:center;justify-content:center;z-index:1000;flex-direction:column;color:#fff">
+<img src="unique.logo.jpg" style="width:130px;height:auto;border:none;border-radius:0;object-fit:contain">
+<h2 style="letter-spacing:5px;margin:12px 0 0">UNIQUE</h2>
+<p style="font-weight:900">Loading Shop... Please Wait</p>
+<p style="font-size:40px;margin:0">⏳</p>
+</div>
+
 <!-- LOGIN SCREEN -->
 <div id="login"><div class="loginBox">
-<img src="unique.logo.jpg" style="width:110px;height:110px;border-radius:50%;object-fit:contain;background:#fff;border:4px solid #FFD700" onerror="this.style.display='none'">
+<img src="unique.logo.jpg" style="width:150px;height:auto;object-fit:contain;background:#fff;border:none;border-radius:0" onerror="this.style.display='none'">
 <img src="flag.png" style="width:80px;height:52px;object-fit:cover;border-radius:8px;border:2px solid #006666;display:block;margin:10px auto">
 <h1 style="margin:4px;color:#006666;letter-spacing:5px">UNIQUE</h1>
 <p style="margin:0;font-weight:900">BEAUTY & FASHION ACCESSORIES<br>MALL SHOP • SOUTH AFRICA 🇿🇦</p>
 <hr>
-<p style="font-weight:900">👋 STAFF LOGIN</p>
+<p style="font-weight:900">STAFF LOGIN</p>
 <input id="staffName" placeholder="Staff Name - e.g. Thandi">
 <input id="loginPin" type="password" placeholder="Enter PIN - Default 1234" onkeydown="if(event.key==='Enter')doLogin()">
 <button onclick="doLogin()" style="width:100%;padding:20px;font-size:20px">🔓 LOGIN TO POS</button>
 <p style="font-size:12px;color:#888">Default PIN: 1234<br>Change PIN in MANAGEMENT after login</p>
 </div></div>
 
-<div class="top"><div style="display:flex;gap:10px;align-items:center"><img src="unique.logo.jpg" style="width:85px;height:85px;border-radius:50%;object-fit:contain;background:#fff" onerror="this.style.display='none'"><img src="flag.png" style="width:70px;height:46px;border-radius:6px;object-fit:cover;border:2px solid #fff"><div><h1>UNIQUE</h1><small>BEAUTY & FASHION ACCESSORIES • MALL SHOP • 🇿🇦 SOUTH AFRICA • <span id="staffShow"></span></small></div></div><div style="text-align:right;font-weight:900"><span id="clock"></span><br><button onclick="openMgmt()" style="padding:10px 14px">🔒 MANAGEMENT</button> <button onclick="cashUp()" style="padding:10px 14px;background:linear-gradient(90deg,#FFD700,#006666)">💰 CASH UP DAY</button> <button onclick="logout()" style="padding:10px 14px;background:#c00;color:#fff">🚪 LOGOUT</button></div></div>
+<div class="top"><div style="display:flex;gap:10px;align-items:center"><img src="unique.logo.jpg" style="width:85px;height:auto;border:none;border-radius:0;object-fit:contain;background:#fff" onerror="this.style.display='none'"><img src="flag.png" style="width:70px;height:46px;border-radius:6px;object-fit:cover;border:2px solid #fff"><div><h1>UNIQUE</h1><small>BEAUTY & FASHION ACCESSORIES • MALL SHOP • 🇿🇦 SOUTH AFRICA • <span id="staffShow"></span></small></div></div><div style="text-align:right;font-weight:900"><span id="clock"></span><br><button onclick="openMgmt()" style="padding:10px 14px">🔒 MANAGEMENT</button> <button onclick="cashUp()" style="padding:10px 14px;background:linear-gradient(90deg,#FFD700,#006666)">💰 CASH UP DAY</button> <button onclick="logout()" style="padding:10px 14px;background:#c00;color:#fff">🚪 LOGOUT</button></div></div>
 <div class="scanbar"><input id="scan" placeholder="🔍 SCAN / TYPE BARCODE - e.g. ITE0022 + Enter" onkeydown="if(event.key==='Enter')doScan()"><button onclick="doScan()">SCAN ADD +</button><button onclick="openDrawer()">💵 OPEN DRAWER</button></div>
 <div class="wrap"><div class="left"><div id="cats" class="cats"></div><button id="backBtn" class="backbtn" style="display:none" onclick="showCats()">← BACK TO ALL GROUPS</button><div id="grid" class="grid"></div></div>
 <div class="right"><div class="cart"><h2 style="margin:0;text-align:center;color:#006666">🛒 CURRENT SALE</h2><p style="text-align:center;margin:4px">Order <b id="orderNo"></b> • Cashier: <b id="cashierShow"></b></p><div id="cart"></div><div class="total"><span>TOTAL</span><span id="total">R0</span></div><select id="payMethod"><option>Cash</option><option>Card</option><option>Card + Cash</option><option>EFT / Tap</option></select><input id="cashGiven" type="number" placeholder="Cash given - e.g. 200 (for change)"><div id="change" style="font-weight:900;text-align:center"></div><input id="cust" placeholder="Customer name / phone (optional)"><input id="extraNote" placeholder="Extra - if you forgot something"><button class="paybtn" onclick="checkout()">💳 CHECKOUT & PRINT</button><button class="drawerbtn" onclick="openDrawer()">💵 OPEN DRAWER</button><button onclick="cart=[];renderCart()" style="width:100%;background:#eee;color:#111">Clear Sale</button><p style="text-align:center;font-weight:800;color:#006666">UNIQUE 💚 Thank You! 🇿🇦</p></div></div></div>
@@ -88,7 +95,7 @@ let ITEMS=[
 ["ITE0100","Earring Hooks",20],["ITE0101","Chain Holders",20],["ITE0102","Shampoo Cap",150],["ITE0103","Socks",50],["ITE0104","Arm Cover",40],["ITE0105","Head Flower",150],
 ["ITE0106","Wedding Needles",150],["ITE0107","Wedding Pins",20],["ITE0108","Wedding Veil Length",100]
 ];
-let GROUP_PIC={"Glasses":"unique-pic1.png","Nail Paint":"unique-pic2.png","Traditional Earring":"unique-pic3.png","Wallet":"unique-pic4.png","Watch":"unique-pic5.png","Bracelet":"unique-pic6.png","Chain":"unique-pic7.png","Brow Cheek":"unique-pic8.png","Wig Cap":"unique-pic9.png","Durag":"unique-pic10.png","Sewing Thread":"unique-pic11.png","Pantyhose":"unique-pic12.png","Zip":"unique-pic13.png","Needle":"unique-pic15.png","Shoe Needle":"unique-pic15.png","Socks":"unique-pic16.png","Head Flower":"unique-pic17.png","Wedding":"unique-pic18.png"};
+let GROUP_PIC={"Glasses":"unique-pic1.png","Nail Paint":"unique-pic2.png","Traditional Earring":"unique-pic3.png","Wallet":"unique-pic4.png","Watch":"unique-pic5.png","Bracelet":"unique-pic6.png","Chain":"unique-pic7.png","Brow Cheek":"unique-pic8.png","Wig Cap":"unique-pic9.png","Durag":"unique-pic10.png","Sewing Thread":"unique-pic11.png","Pantyhose":"unique-pic12.png","Zip":"unique-pic13.png","Needle":"unique-pic14.png","Shoe Needle":"unique-pic14.png","Socks":"unique-pic15.png","Head Flower":"unique-pic16.png","Wedding":"unique-pic17.png"};
 function emojiOf(n){if(n.includes("Glasses"))return "👓";if(n.includes("Nail"))return "💅";if(n.includes("Earring"))return "💎";if(n.includes("Wallet"))return "👛";if(n.includes("Watch"))return "⌚";if(n.includes("Bracelet"))return "📿";if(n.includes("Chain"))return "🔗";if(n.includes("Durag"))return "🧢";if(n.includes("Thread"))return "🧵";if(n.includes("Pantyhose"))return "🧦";if(n.includes("Zip"))return "🤐";if(n.includes("Needle"))return "🪡";if(n.includes("Socks"))return "🧦";if(n.includes("Flower"))return "🌸";if(n.includes("Wedding"))return "👰";return "✨"}
 function picFor(name){return GROUP_PIC[catOf(name)]||""}
 function imgTag(name){let p=picFor(name);if(!p)return `<span style="font-size:40px">${emojiOf(name)}</span>`;return `<img src="${p}" onerror="this.style.display='none';this.parentElement.innerHTML='${emojiOf(name)}';this.parentElement.style.fontSize='40px'">`}
@@ -98,7 +105,7 @@ let SALES=JSON.parse(localStorage.getItem("unique_sales")||"[]");
 let PIN=localStorage.getItem("unique_pin")||"1234";
 let STAFF="";
 function saveAll(){localStorage.setItem("unique_stock",JSON.stringify(STOCK));localStorage.setItem("unique_prices",JSON.stringify(PRICES));localStorage.setItem("unique_sales",JSON.stringify(SALES));localStorage.setItem("unique_pin",PIN)}
-function doLogin(){let name=document.getElementById("staffName").value.trim();let pin=document.getElementById("loginPin").value.trim();if(!name)return alert("Type Staff Name first");if(pin!==PIN)return alert("Wrong PIN! Default is 1234");STAFF=name;document.getElementById("staffShow").textContent="Cashier: "+STAFF;document.getElementById("cashierShow").textContent=STAFF;document.getElementById("login").style.display="none";document.getElementById("scan").focus()}
+function doLogin(){let name=document.getElementById("staffName").value.trim();let pin=document.getElementById("loginPin").value.trim();if(!name)return alert("Type Staff Name first");if(pin!==PIN)return alert("Wrong PIN! Default is 1234");STAFF=name;document.getElementById("staffShow").textContent="Cashier: "+STAFF;document.getElementById("cashierShow").textContent=STAFF;document.getElementById("login").style.display="none";let load=document.getElementById("loading");load.style.display="flex";setTimeout(()=>{load.style.display="none";document.getElementById("scan").focus();showCats();},1500);}
 function logout(){if(confirm("Logout "+STAFF+"?")){document.getElementById("login").style.display="flex";document.getElementById("loginPin").value="";}}
 let cart=[],orderNo="UQ-"+Math.floor(10000+Math.random()*89999);document.getElementById("orderNo").textContent=orderNo;
 function tick(){document.getElementById("clock").textContent=new Date().toLocaleString("en-ZA")}tick();setInterval(tick,1000);
